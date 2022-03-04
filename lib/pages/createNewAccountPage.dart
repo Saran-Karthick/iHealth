@@ -1,9 +1,15 @@
+import 'dart:convert';
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:ihealth/api%20configuration/constant-assets.dart';
+import 'package:ihealth/model/emailRegisterModel.dart';
+import 'package:ihealth/model/phoneRegisterModel.dart';
 import 'package:ihealth/pages/loginPage.dart';
 import 'package:ihealth/widgets/colors.dart';
 import 'package:ihealth/widgets/font-size.dart';
 import 'package:ihealth/widgets/font-style.dart';
+import 'package:http/http.dart' as http;
 
 
 
@@ -267,6 +273,32 @@ class _EmailState extends State<Email> {
 
   bool isChecked = false;
 
+  bool passwordVisibility = false;
+  bool confirmPasswordVisibility = false;
+
+  EmailRegisterModel? _emailUser;
+
+  Future<EmailRegisterModel?> createUser(String email, String password, String agreePolicy, String registrationType) async {
+
+    var registerUrl = Uri.parse("https://zeoner.com/ihealth/api/auth/register");
+      var response = await http.post(registerUrl, body: {
+          "registration_type": registrationType,
+          "email": email,
+          "password": password,
+          "agree_privacy_policy": agreePolicy
+      });
+
+      print(response.statusCode);
+
+      if(response.statusCode == 200){
+        var responseValue = response.body;
+        return emailRegisterModelFromJson(responseValue);
+      }
+      else {
+        return null;
+      }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -355,7 +387,7 @@ class _EmailState extends State<Email> {
                       Container(
                         width: screenWidth * 0.15,
                         child: Icon(
-                          Icons.email,
+                          Icons.lock,
                           color: Colors.grey,
                           size: 26,
                         ),
@@ -374,8 +406,9 @@ class _EmailState extends State<Email> {
                         ),
                         child: TextFormField(
                           controller: _pwdController,
+                          obscureText: !passwordVisibility,
                           validator: (value) {
-                            if(value == null || value.isEmpty) {
+                            if(value == null || value.isEmpty || value.length < 6) {
                               return 'Enter Valid Password';
                             }
                           },
@@ -388,9 +421,15 @@ class _EmailState extends State<Email> {
                       SizedBox(
                         width: 15,
                       ),
-                      Container(
+                      GestureDetector(
+                        onTap: () {
+                          setState(() {
+                            passwordVisibility = !passwordVisibility;
+                          });
+                        },
                         child: Icon(
-                          Icons.email,
+                          passwordVisibility ?
+                          Icons.visibility : Icons.visibility_off,
                           color: Colors.grey,
                           size: 26,
                         ),
@@ -419,7 +458,7 @@ class _EmailState extends State<Email> {
                       Container(
                         width: screenWidth * 0.15,
                         child: Icon(
-                          Icons.email,
+                          Icons.lock,
                           color: Colors.grey,
                           size: 26,
                         ),
@@ -438,8 +477,10 @@ class _EmailState extends State<Email> {
                         ),
                         child: TextFormField(
                           controller: _conformPwdController,
+                          obscureText: !confirmPasswordVisibility,
                           validator: (value) {
-                            if(value == null || value.isEmpty) {
+
+                            if(value == null || value.isEmpty || value.length < 6 || value != _pwdController.text) {
                               return 'Enter Correct Password';
                             }
                           },
@@ -452,9 +493,15 @@ class _EmailState extends State<Email> {
                       SizedBox(
                         width: 15,
                       ),
-                      Container(
+                      GestureDetector(
+                        onTap: () {
+                          setState(() {
+                            confirmPasswordVisibility = !confirmPasswordVisibility;
+                          });
+                        },
                         child: Icon(
-                          Icons.email,
+                          confirmPasswordVisibility ?
+                          Icons.visibility : Icons.visibility_off,
                           color: Colors.grey,
                           size: 26,
                         ),
@@ -501,12 +548,26 @@ class _EmailState extends State<Email> {
           ),
 
           GestureDetector(
-            onTap: () {
+            onTap: () async {
               print('Create New Account Clicked');
-              if(_formKey.currentState!.validate()){
-                /*Navigator.push(
+              if(isChecked) {
+                if (_formKey.currentState!.validate()) {
+                  var userEmail = _emailController.text;
+                  var userPassword = _pwdController.text;
+                  var agreePolicy = "1";
+                  var registrationType = 'email';
+                  EmailRegisterModel? create = await createUser(userEmail, userPassword, agreePolicy, registrationType);
+                  print(create);
+                  setState(() {
+                    if(create != null) {
+                      _emailUser = create;
+                    }
+                    print(_emailUser);
+                  });
+                  /*Navigator.push(
                     context,
                     MaterialPageRoute(builder: (context) => CreateNewAccountPage())); */
+                }
               }
             },
             child: Container(
@@ -551,6 +612,29 @@ class _PhoneState extends State<Phone> {
   bool isValidCode = false;
 
   bool isChecked = false;
+
+  PhoneRegisterModel? _phoneUser;
+
+  Future<PhoneRegisterModel?> createUser(String phone, String agreePolicy, String registrationType) async {
+
+    var registerUrl = Uri.parse("https://zeoner.com/ihealth/api/auth/register");
+    var response = await http.post(registerUrl, body: {
+      "registration_type": registrationType,
+      "phone": phone,
+      "agree_privacy_policy": agreePolicy
+    });
+
+    print(response.statusCode);
+
+    if(response.statusCode == 200){
+      var responseValue = response.body;
+      return phoneRegisterModelFromJson(responseValue);
+    }
+    else {
+      return null;
+    }
+  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -738,12 +822,25 @@ class _PhoneState extends State<Phone> {
           ),
 
           GestureDetector(
-            onTap: () {
+            onTap: () async {
               print('Create New Account Clicked');
-              if(_formKey.currentState!.validate()){
-                /* Navigator.push(
+              if(isChecked) {
+                if (_formKey.currentState!.validate()) {
+                  var userPhone = _phoneController.text;
+                  var agreePolicy = "1";
+                  var registrationType = 'phone';
+                  PhoneRegisterModel? create = await createUser(userPhone, agreePolicy, registrationType);
+                  print(create);
+                  setState(() {
+                    if(create != null) {
+                      _phoneUser = create;
+                    }
+                    print(_phoneUser);
+                  });
+                  /*Navigator.push(
                     context,
                     MaterialPageRoute(builder: (context) => CreateNewAccountPage())); */
+                }
               }
             },
             child: Container(

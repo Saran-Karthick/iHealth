@@ -72,7 +72,7 @@ class _SelectTypePageState extends State<SelectTypePage> {
                 child: Column(
                   children: [
                     Container(
-                      width: screenWidth * 0.7,
+                      width: screenWidth * 0.75,
                       height: screenHeight * 0.2,
                       decoration: BoxDecoration(
                         color: primaryBlue
@@ -95,7 +95,7 @@ class _SelectTypePageState extends State<SelectTypePage> {
                         padding: EdgeInsets.only(
                           left: 15
                         ),
-                        width: screenWidth * 0.7,
+                        width: screenWidth * 0.75,
                         height: screenHeight * 0.07,
                         decoration: BoxDecoration(
                             color: white
@@ -147,7 +147,7 @@ class _SelectTypePageState extends State<SelectTypePage> {
                 child: Column(
                   children: [
                     Container(
-                      width: screenWidth * 0.7,
+                      width: screenWidth * 0.75,
                       height: screenHeight * 0.2,
                       decoration: BoxDecoration(
                           color: primaryBlue
@@ -168,9 +168,9 @@ class _SelectTypePageState extends State<SelectTypePage> {
                       },
                       child: Container(
                         padding: EdgeInsets.only(
-                            left: 15
+                            left: 15,
                         ),
-                        width: screenWidth * 0.7,
+                        width: screenWidth * 0.75,
                         height: screenHeight * 0.07,
                         decoration: BoxDecoration(
                             color: white

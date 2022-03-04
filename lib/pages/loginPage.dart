@@ -1,11 +1,14 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:ihealth/api%20configuration/constant-assets.dart';
+import 'package:ihealth/model/emailLoginModel.dart';
+import 'package:ihealth/model/phoneLoginModel.dart';
 import 'package:ihealth/pages/createNewAccountPage.dart';
 import 'package:ihealth/pages/homePage.dart';
 import 'package:ihealth/widgets/colors.dart';
 import 'package:ihealth/widgets/font-size.dart';
 import 'package:ihealth/widgets/font-style.dart';
+import 'package:http/http.dart' as http;
 
 
 
@@ -356,6 +359,30 @@ class _EmailState extends State<Email> {
   bool isValidEmail = false;
   bool isValidPassword = false;
 
+  bool passwordVisibility = false;
+
+  EmailLoginModel? _emailUser;
+
+  Future<EmailLoginModel?> createUser(String email, String password, String registrationType) async {
+
+    var registerUrl = Uri.parse("https://zeoner.com/ihealth/api/auth/login");
+    var response = await http.post(registerUrl, body: {
+      "auth_type": registrationType,
+      "email": email,
+      "password": password
+    });
+
+    print(response.statusCode);
+
+    if(response.statusCode == 200){
+      var responseValue = response.body;
+      return emailLoginModelFromJson(responseValue);
+    }
+    else {
+      return null;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -444,7 +471,7 @@ class _EmailState extends State<Email> {
                       Container(
                         width: screenWidth * 0.15,
                         child: Icon(
-                          Icons.email,
+                          Icons.lock,
                           color: Colors.grey,
                           size: 26,
                         ),
@@ -463,8 +490,9 @@ class _EmailState extends State<Email> {
                         ),
                         child: TextFormField(
                           controller: _pwdController,
+                          obscureText: !passwordVisibility,
                           validator: (value) {
-                            if(value == null || value.isEmpty) {
+                            if(value == null || value.isEmpty || value.length < 6) {
                               return 'Enter Valid Password';
                             }
                           },
@@ -477,9 +505,15 @@ class _EmailState extends State<Email> {
                       SizedBox(
                         width: 15,
                       ),
-                      Container(
+                      GestureDetector(
+                        onTap: () {
+                          setState(() {
+                            passwordVisibility = !passwordVisibility;
+                          });
+                        },
                         child: Icon(
-                          Icons.email,
+                          passwordVisibility ?
+                          Icons.visibility : Icons.visibility_off,
                           color: Colors.grey,
                           size: 26,
                         ),
@@ -513,9 +547,20 @@ class _EmailState extends State<Email> {
           ),
 
           GestureDetector(
-            onTap: () {
+            onTap: () async {
               print('Login Clicked');
               if(_formKey.currentState!.validate()){
+                var userEmail = _emailController.text;
+                var userPassword = _pwdController.text;
+                var authType = 'email';
+                EmailLoginModel? create = await createUser(userEmail, userPassword, authType);
+                print(create);
+                setState(() {
+                  if(create != null) {
+                    _emailUser = create;
+                  }
+                  print(_emailUser);
+                });
                 Navigator.push(
                     context,
                     MaterialPageRoute(builder: (context) => HomePage()));
@@ -561,6 +606,27 @@ class _PhoneState extends State<Phone> {
 
   bool isValidPhone = false;
   bool isValidCode = false;
+
+  PhoneLoginModel? _phoneUser;
+
+  Future<PhoneLoginModel?> createUser(String phone, String registrationType) async {
+
+    var registerUrl = Uri.parse("https://zeoner.com/ihealth/api/auth/login");
+    var response = await http.post(registerUrl, body: {
+      "auth_type": registrationType,
+      "phone": phone,
+    });
+
+    print(response.statusCode);
+
+    if(response.statusCode == 200){
+      var responseValue = response.body;
+      return phoneLoginModelFromJson(responseValue);
+    }
+    else {
+      return null;
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -719,12 +785,25 @@ class _PhoneState extends State<Phone> {
           ),
 
           GestureDetector(
-            onTap: () {
+            onTap: () async {
               print('Login Clicked');
               if(_formKey.currentState!.validate()){
-               Navigator.push(
+
+                var userPhone = _phoneController.text;
+                var authType = 'phone';
+                PhoneLoginModel? create = await createUser(userPhone,authType);
+                print(create);
+                setState(() {
+                  if(create != null) {
+                    _phoneUser = create;
+                  }
+                  print(_phoneUser);
+                });
+
+
+               /*Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (context) => HomePage()));
+                    MaterialPageRoute(builder: (context) => HomePage()));*/
               }
             },
             child: Container(

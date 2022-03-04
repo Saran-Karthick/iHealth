@@ -54,7 +54,7 @@ class _SelectResultPageOneState extends State<SelectResultPageOne> {
 
               Row(
                 children: [
-                  
+
                   Container(
                     width: 25,
                     height: 25,
@@ -76,7 +76,7 @@ class _SelectResultPageOneState extends State<SelectResultPageOne> {
                   ),
 
                   SizedBox(
-                    width: 40,
+                    width: 36,
                     child: Divider(
                       color: Colors.orange,
                       thickness: 2,
@@ -103,7 +103,7 @@ class _SelectResultPageOneState extends State<SelectResultPageOne> {
                   ),
 
                   SizedBox(
-                    width: 40,
+                    width: 36,
                     child: Divider(
                       color: Colors.orange,
                       thickness: 2,
@@ -129,7 +129,7 @@ class _SelectResultPageOneState extends State<SelectResultPageOne> {
                     ),
                   ),
                   SizedBox(
-                    width: 40,
+                    width: 36,
                     child: Divider(
                       color: Colors.orange,
                       thickness: 2,
@@ -155,7 +155,7 @@ class _SelectResultPageOneState extends State<SelectResultPageOne> {
                     ),
                   ),
                   SizedBox(
-                    width: 40,
+                    width: 36,
                     child: Divider(
                       color: Colors.orange,
                       thickness: 2,
@@ -182,7 +182,7 @@ class _SelectResultPageOneState extends State<SelectResultPageOne> {
                   ),
 
                   SizedBox(
-                    width: 40,
+                    width: 36,
                     child: Divider(
                       color: Colors.orange,
                       thickness: 2,
@@ -207,7 +207,7 @@ class _SelectResultPageOneState extends State<SelectResultPageOne> {
                       ),
                     ),
                   ),
-                  
+
                 ],
               ),
 

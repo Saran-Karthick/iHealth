@@ -74,7 +74,7 @@ class _SelectResultPageTwoState extends State<SelectResultPageTwo> {
                   ),
 
                   SizedBox(
-                    width: 40,
+                    width: 36,
                     child: Divider(
                       color: Colors.orange,
                       thickness: 2,
@@ -102,7 +102,7 @@ class _SelectResultPageTwoState extends State<SelectResultPageTwo> {
                   ),
 
                   SizedBox(
-                    width: 40,
+                    width: 36,
                     child: Divider(
                       color: Colors.orange,
                       thickness: 2,
@@ -128,7 +128,7 @@ class _SelectResultPageTwoState extends State<SelectResultPageTwo> {
                     ),
                   ),
                   SizedBox(
-                    width: 40,
+                    width: 36,
                     child: Divider(
                       color: Colors.orange,
                       thickness: 2,
@@ -154,7 +154,7 @@ class _SelectResultPageTwoState extends State<SelectResultPageTwo> {
                     ),
                   ),
                   SizedBox(
-                    width: 40,
+                    width: 36,
                     child: Divider(
                       color: Colors.orange,
                       thickness: 2,
@@ -181,7 +181,7 @@ class _SelectResultPageTwoState extends State<SelectResultPageTwo> {
                   ),
 
                   SizedBox(
-                    width: 40,
+                    width: 36,
                     child: Divider(
                       color: Colors.orange,
                       thickness: 2,
