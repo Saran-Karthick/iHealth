@@ -301,6 +301,14 @@ class _EmailState extends State<Email> {
 
       if(response.statusCode == 200){
         String responseValue = response.body;
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          content: Text("Successfully Registered",
+            textAlign: TextAlign.center,
+          ),
+          duration: Duration(milliseconds: 500),
+          backgroundColor: Colors.lightBlueAccent,
+        ));
+        await Future.delayed(const Duration(seconds: 1), (){});
         print(responseValue);
         return emailRegisterModelFromJson(responseValue);
       }
@@ -310,6 +318,7 @@ class _EmailState extends State<Email> {
             textAlign: TextAlign.center,
           ),
           backgroundColor: Colors.red,
+          duration: Duration(milliseconds: 500),
         ));
         setState(() {
           indicator = false;
@@ -670,6 +679,14 @@ class _PhoneState extends State<Phone> {
 
     if(response.statusCode == 200){
       String responseValue = response.body;
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: Text("Successfully Registered",
+          textAlign: TextAlign.center,
+        ),
+        duration: Duration(milliseconds: 500),
+        backgroundColor: Colors.lightBlueAccent,
+      ));
+      await Future.delayed(const Duration(seconds: 1), (){});
       print(responseValue);
       return 1;
     }
@@ -679,6 +696,7 @@ class _PhoneState extends State<Phone> {
           textAlign: TextAlign.center,
         ),
         backgroundColor: Colors.red,
+        duration: Duration(milliseconds: 500),
       ));
       setState(() {
         indicator = false;

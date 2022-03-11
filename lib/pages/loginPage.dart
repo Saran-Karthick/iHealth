@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:ihealth/api%20configuration/apiDetails.dart';
 import 'package:ihealth/api%20configuration/constant-assets.dart';
 import 'package:ihealth/model/emailLoginModel.dart';
@@ -409,6 +410,14 @@ class _EmailState extends State<Email> {
 
     if(response.statusCode == 200){
       String responseValue = response.body;
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: Text("Login Successful",
+          textAlign: TextAlign.center,
+        ),
+        duration: Duration(milliseconds: 500),
+        backgroundColor: Colors.lightBlueAccent,
+      ));
+      await Future.delayed(const Duration(seconds: 1), (){});
       print(responseValue);
       return emailLoginModelFromJson(responseValue);
     }
@@ -418,6 +427,7 @@ class _EmailState extends State<Email> {
           textAlign: TextAlign.center,
         ),
         backgroundColor: Colors.red,
+        duration: Duration(milliseconds: 500),
       ));
       setState(() {
         indicator = false;
@@ -690,6 +700,14 @@ class _PhoneState extends State<Phone> {
 
     if(response.statusCode == 200){
       String responseValue = response.body;
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: Text("Login Successful",
+          textAlign: TextAlign.center,
+        ),
+        duration: Duration(milliseconds: 500),
+        backgroundColor: Colors.lightBlueAccent,
+      ));
+      await Future.delayed(const Duration(seconds: 1), (){});
       print(responseValue);
       return 1;
     }
@@ -699,6 +717,7 @@ class _PhoneState extends State<Phone> {
           textAlign: TextAlign.center,
         ),
         backgroundColor: Colors.red,
+        duration: Duration(milliseconds: 500),
       ));
       setState(() {
         indicator = false;

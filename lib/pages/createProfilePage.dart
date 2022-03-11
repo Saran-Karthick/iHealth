@@ -4,6 +4,7 @@ import 'package:ihealth/pages/importantPage.dart';
 import 'package:ihealth/widgets/colors.dart';
 import 'package:ihealth/widgets/font-size.dart';
 import 'package:ihealth/widgets/font-style.dart';
+import 'package:intl/intl.dart';
 
 
 
@@ -27,6 +28,20 @@ class _CreateProfilePageState extends State<CreateProfilePage> {
   bool isMale = false;
   bool isFemale = false;
   bool activateButton = false;
+
+  datePicker() {
+    Container(
+      height: 200,
+      child: CupertinoDatePicker(
+        mode: CupertinoDatePickerMode.date,
+        initialDateTime: DateTime(1969, 1, 1),
+        onDateTimeChanged: (DateTime newDateTime) {
+          // Do something
+          print(newDateTime);
+        },
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -209,6 +224,19 @@ class _CreateProfilePageState extends State<CreateProfilePage> {
                               left: screenWidth * 0.03
                           ),
                           child: TextFormField(
+                            onTap: () async {
+                              FocusScope.of(context).requestFocus(new FocusNode());
+                              await showDatePicker(
+                                  context: context,
+                                  initialDate: DateTime.now(),
+                              firstDate: DateTime(1900),
+                              lastDate: DateTime(2050),
+                              ).then((selectedDate) {
+                              if (selectedDate != null) {
+                              _dobController.text = DateFormat('yyyy-MM-dd').format(selectedDate);
+                              }
+                              });
+                            },
                             controller: _dobController,
                             validator: (value) {
                               if(value == null || value.isEmpty) {

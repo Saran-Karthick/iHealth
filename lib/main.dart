@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:ihealth/pages/loginPage.dart';
 
 void main() {
@@ -22,6 +23,7 @@ class _MyAppState extends State<MyApp> {
       title: 'iHealth',
       debugShowCheckedModeBanner: false,
       home: LoginPage(),
+      builder: EasyLoading.init(),
     );
   }
 }
