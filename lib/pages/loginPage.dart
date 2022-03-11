@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:ihealth/api%20configuration/apiDetails.dart';
 import 'package:ihealth/api%20configuration/constant-assets.dart';
 import 'package:ihealth/model/emailLoginModel.dart';
 import 'package:ihealth/model/phoneLoginModel.dart';
@@ -9,7 +10,7 @@ import 'package:ihealth/widgets/colors.dart';
 import 'package:ihealth/widgets/font-size.dart';
 import 'package:ihealth/widgets/font-style.dart';
 import 'package:http/http.dart' as http;
-
+import 'package:oauth2/oauth2.dart' as oauth2;
 
 
 class LoginPage extends StatefulWidget {
@@ -26,6 +27,28 @@ class _LoginPageState extends State<LoginPage> {
 
   bool isEmailSelected = true;
   bool isPhoneSelected = false;
+
+  @override
+  void initState() {
+    super.initState();
+    client();
+  }
+
+  client() async {
+    print('i am in');
+    final authorizationEndpoint =
+    Uri.parse(endPoint);
+    final identifier = clientId;
+    final secret = clientSecret;
+
+    var client = await oauth2.clientCredentialsGrant(
+        authorizationEndpoint, identifier, secret);
+
+
+    accessToken = client.credentials.accessToken;
+    print(accessToken);
+  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -198,7 +221,7 @@ class _LoginPageState extends State<LoginPage> {
                       isEmailSelected ? Email() : Phone(),
 
                       SizedBox(
-                        height: screenHeight * 0.09,
+                        height: screenHeight * 0.03,
                       ),
 
                       Row(
@@ -238,7 +261,10 @@ class _LoginPageState extends State<LoginPage> {
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             GestureDetector(
-                              onTap: () {},
+                              onTap: () {
+                                print('google');
+                                client();
+                              },
                               child: Container(
                                 padding: EdgeInsets.all(8),
                                 width: 35,
@@ -361,27 +387,45 @@ class _EmailState extends State<Email> {
 
   bool passwordVisibility = false;
 
+  bool indicator = false;
+
   EmailLoginModel? _emailUser;
 
-  Future<EmailLoginModel?> createUser(String email, String password, String registrationType) async {
+  Future<EmailLoginModel?> loginUser(String email, String password) async {
 
+    String token = "Bearer "+accessToken;
+    print(token);
     var registerUrl = Uri.parse("https://zeoner.com/ihealth/api/auth/login");
-    var response = await http.post(registerUrl, body: {
-      "auth_type": registrationType,
+    final response = await http.post(registerUrl,headers: <String, String>{
+      "Accept": "application/json",
+      "Authorization": token
+    }, body: {
+      "auth_type": "email",
       "email": email,
-      "password": password
+      "password": password,
     });
 
     print(response.statusCode);
 
     if(response.statusCode == 200){
-      var responseValue = response.body;
+      String responseValue = response.body;
+      print(responseValue);
       return emailLoginModelFromJson(responseValue);
     }
-    else {
+    else if(response.statusCode == 422) {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: Text("Register to Login",
+          textAlign: TextAlign.center,
+        ),
+        backgroundColor: Colors.red,
+      ));
+      setState(() {
+        indicator = false;
+      });
       return null;
     }
   }
+
 
   @override
   Widget build(BuildContext context) {
@@ -550,20 +594,27 @@ class _EmailState extends State<Email> {
             onTap: () async {
               print('Login Clicked');
               if(_formKey.currentState!.validate()){
-                var userEmail = _emailController.text;
-                var userPassword = _pwdController.text;
-                var authType = 'email';
-                EmailLoginModel? create = await createUser(userEmail, userPassword, authType);
-                print(create);
                 setState(() {
+                  indicator = true;
+                });
+                String userEmail = _emailController.text;
+                String userPassword = _pwdController.text;
+                EmailLoginModel? create = await loginUser(userEmail, userPassword);
+                print(create!.token);
                   if(create != null) {
                     _emailUser = create;
+                    setState(() {
+                      indicator = false;
+                    });
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => HomePage()));
                   }
-                  print(_emailUser);
-                });
-                Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => HomePage()));
+                  print(_emailUser!.token);
+
+                // Navigator.push(
+                //     context,
+                //     MaterialPageRoute(builder: (context) => HomePage()));
               }
             },
             child: Container(
@@ -579,6 +630,17 @@ class _EmailState extends State<Email> {
               ),
             ),
           ),
+
+          SizedBox(
+            height: screenHeight * 0.02,
+          ),
+
+          Visibility(
+            visible: indicator,
+            child: Center(
+              child: CircularProgressIndicator(),
+            ),
+          )
 
         ],
       ),
@@ -607,24 +669,41 @@ class _PhoneState extends State<Phone> {
   bool isValidPhone = false;
   bool isValidCode = false;
 
-  PhoneLoginModel? _phoneUser;
+  bool indicator = false;
 
-  Future<PhoneLoginModel?> createUser(String phone, String registrationType) async {
+  late int _phoneUser;
 
+  loginUser(String phone) async {
+
+    String token = "Bearer "+accessToken;
+    print(token);
     var registerUrl = Uri.parse("https://zeoner.com/ihealth/api/auth/login");
-    var response = await http.post(registerUrl, body: {
-      "auth_type": registrationType,
-      "phone": phone,
+    final response = await http.post(registerUrl,headers: <String, String>{
+      "Accept": "application/json",
+      "Authorization": token
+    }, body: {
+      "auth_type": "phone",
+      "phone": phone
     });
 
     print(response.statusCode);
 
     if(response.statusCode == 200){
-      var responseValue = response.body;
-      return phoneLoginModelFromJson(responseValue);
+      String responseValue = response.body;
+      print(responseValue);
+      return 1;
     }
-    else {
-      return null;
+    else if(response.statusCode == 422) {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: Text("Register to Login",
+          textAlign: TextAlign.center,
+        ),
+        backgroundColor: Colors.red,
+      ));
+      setState(() {
+        indicator = false;
+      });
+      return 0;
     }
   }
 
@@ -671,7 +750,7 @@ class _PhoneState extends State<Phone> {
                       SizedBox(
                         width: 10,
                       ),
-                      Text('(+1)',
+                      Text('(+91)',
                         style: TextStyle(
                           fontWeight: FontWeight.bold
                         ),
@@ -781,25 +860,30 @@ class _PhoneState extends State<Phone> {
           ),
 
           SizedBox(
-            height: screenHeight * 0.02,
+            height: screenHeight * 0.01,
           ),
 
           GestureDetector(
             onTap: () async {
               print('Login Clicked');
               if(_formKey.currentState!.validate()){
-
-                var userPhone = _phoneController.text;
-                var authType = 'phone';
-                PhoneLoginModel? create = await createUser(userPhone,authType);
-                print(create);
                 setState(() {
-                  if(create != null) {
-                    _phoneUser = create;
-                  }
-                  print(_phoneUser);
+                  indicator = true;
                 });
-
+                String userPhone = _phoneController.text;
+                userPhone = "+91" + userPhone;
+                int create = await loginUser(userPhone);
+                print(create);
+                if(create == 1) {
+                  _phoneUser = create;
+                  setState(() {
+                    indicator = false;
+                  });
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => HomePage()));
+                }
+                print(_phoneUser);
 
                /*Navigator.push(
                     context,
@@ -835,6 +919,17 @@ class _PhoneState extends State<Phone> {
               ),
             ),
           ),
+
+          SizedBox(
+            height: screenHeight * 0.02,
+          ),
+
+          Visibility(
+            visible: indicator,
+            child: Center(
+              child: CircularProgressIndicator(),
+            ),
+          )
 
         ],
       ),

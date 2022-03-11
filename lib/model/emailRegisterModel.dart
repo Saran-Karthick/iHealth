@@ -10,32 +10,16 @@ String emailRegisterModelToJson(EmailRegisterModel data) => json.encode(data.toJ
 
 class EmailRegisterModel {
   EmailRegisterModel({
-    required this.agreePrivacyPolicy,
-    required this.email,
-    required this.password,
-    required this.passwordConfirmation,
-    required this.registrationType,
+    required this.token,
   });
 
-  String agreePrivacyPolicy;
-  String email;
-  String password;
-  String passwordConfirmation;
-  String registrationType;
+  String token;
 
   factory EmailRegisterModel.fromJson(Map<String, dynamic> json) => EmailRegisterModel(
-    agreePrivacyPolicy: json["agree_privacy_policy"],
-    email: json["email"],
-    password: json["password"],
-    passwordConfirmation: json["password_confirmation"],
-    registrationType: json["registration_type"],
+    token: json["token"],
   );
 
   Map<String, dynamic> toJson() => {
-    "agree_privacy_policy": agreePrivacyPolicy,
-    "email": email,
-    "password": password,
-    "password_confirmation": passwordConfirmation,
-    "registration_type": registrationType,
+    "token": token,
   };
 }

@@ -10,24 +10,16 @@ String emailLoginModelToJson(EmailLoginModel data) => json.encode(data.toJson())
 
 class EmailLoginModel {
   EmailLoginModel({
-    required this.authType,
-    required this.email,
-    required this.password,
+    required this.token,
   });
 
-  String authType;
-  String email;
-  String password;
+  String token;
 
   factory EmailLoginModel.fromJson(Map<String, dynamic> json) => EmailLoginModel(
-    authType: json["auth_type"],
-    email: json["email"],
-    password: json["password"],
+    token: json["token"],
   );
 
   Map<String, dynamic> toJson() => {
-    "auth_type": authType,
-    "email": email,
-    "password": password,
+    "token": token,
   };
 }

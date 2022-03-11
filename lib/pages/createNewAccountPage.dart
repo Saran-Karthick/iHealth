@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:ihealth/api%20configuration/apiDetails.dart';
 import 'package:ihealth/api%20configuration/constant-assets.dart';
 import 'package:ihealth/model/emailRegisterModel.dart';
 import 'package:ihealth/model/phoneRegisterModel.dart';
@@ -273,28 +274,46 @@ class _EmailState extends State<Email> {
 
   bool isChecked = false;
 
+  bool indicator = false;
+
   bool passwordVisibility = false;
   bool confirmPasswordVisibility = false;
 
   EmailRegisterModel? _emailUser;
 
-  Future<EmailRegisterModel?> createUser(String email, String password, String agreePolicy, String registrationType) async {
+  Future<EmailRegisterModel?> createUser(String email, String password, String confirmPassword) async {
 
+    String token = "Bearer "+accessToken;
+    print(token);
     var registerUrl = Uri.parse("https://zeoner.com/ihealth/api/auth/register");
-      var response = await http.post(registerUrl, body: {
-          "registration_type": registrationType,
-          "email": email,
-          "password": password,
-          "agree_privacy_policy": agreePolicy
+      final response = await http.post(registerUrl,headers: <String, String>{
+        "Accept": "application/json",
+        "Authorization": token
+      }, body: {
+        "agree_privacy_policy": "1",
+        "email": email,
+        "password": password,
+        "password_confirmation": confirmPassword,
+        "registration_type": "email"
       });
 
       print(response.statusCode);
 
       if(response.statusCode == 200){
-        var responseValue = response.body;
+        String responseValue = response.body;
+        print(responseValue);
         return emailRegisterModelFromJson(responseValue);
       }
       else {
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          content: Text("The email has already been taken",
+            textAlign: TextAlign.center,
+          ),
+          backgroundColor: Colors.red,
+        ));
+        setState(() {
+          indicator = false;
+        });
         return null;
       }
   }
@@ -544,7 +563,7 @@ class _EmailState extends State<Email> {
           ),
 
           SizedBox(
-            height: screenHeight * 0.06,
+            height: indicator ? screenHeight * 0.02 : screenHeight * 0.06,
           ),
 
           GestureDetector(
@@ -552,18 +571,24 @@ class _EmailState extends State<Email> {
               print('Create New Account Clicked');
               if(isChecked) {
                 if (_formKey.currentState!.validate()) {
-                  var userEmail = _emailController.text;
-                  var userPassword = _pwdController.text;
-                  var agreePolicy = "1";
-                  var registrationType = 'email';
-                  EmailRegisterModel? create = await createUser(userEmail, userPassword, agreePolicy, registrationType);
-                  print(create);
                   setState(() {
-                    if(create != null) {
-                      _emailUser = create;
-                    }
-                    print(_emailUser);
+                    indicator = true;
                   });
+                  String userEmail = _emailController.text;
+                  String userPassword = _pwdController.text;
+                  String userConfirmPassword = _conformPwdController.text;
+                  EmailRegisterModel? create = await createUser(userEmail,userPassword, userConfirmPassword);
+                  print(create!.token);
+                  if(create != null) {
+                    setState(() {
+                      _emailUser = create;
+                      indicator = false;
+                    });
+                    Navigator.push(context,
+                        MaterialPageRoute(builder: (context) => LoginPage()));
+                  }
+                  print(_emailUser!.token);
+
                   /*Navigator.push(
                     context,
                     MaterialPageRoute(builder: (context) => CreateNewAccountPage())); */
@@ -583,6 +608,17 @@ class _EmailState extends State<Email> {
               ),
             ),
           ),
+
+          SizedBox(
+            height: screenHeight * 0.02,
+          ),
+
+          Visibility(
+            visible: indicator,
+            child: Center(
+              child: CircularProgressIndicator(),
+            ),
+          )
 
         ],
       ),
@@ -611,30 +647,45 @@ class _PhoneState extends State<Phone> {
   bool isValidPhone = false;
   bool isValidCode = false;
 
+  bool indicator = false;
   bool isChecked = false;
 
-  PhoneRegisterModel? _phoneUser;
+  int _phoneUser = 0;
 
-  Future<PhoneRegisterModel?> createUser(String phone, String agreePolicy, String registrationType) async {
+   createUser(String phone) async {
 
+    String token = "Bearer "+accessToken;
+    print(token);
     var registerUrl = Uri.parse("https://zeoner.com/ihealth/api/auth/register");
-    var response = await http.post(registerUrl, body: {
-      "registration_type": registrationType,
+    final response = await http.post(registerUrl,headers: <String, String>{
+      "Accept": "application/json",
+      "Authorization": token
+    }, body: {
+      "agree_privacy_policy": "1",
       "phone": phone,
-      "agree_privacy_policy": agreePolicy
+      "registration_type": "phone"
     });
 
     print(response.statusCode);
 
     if(response.statusCode == 200){
-      var responseValue = response.body;
-      return phoneRegisterModelFromJson(responseValue);
+      String responseValue = response.body;
+      print(responseValue);
+      return 1;
     }
     else {
-      return null;
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: Text("The phone number has already been taken",
+          textAlign: TextAlign.center,
+        ),
+        backgroundColor: Colors.red,
+      ));
+      setState(() {
+        indicator = false;
+      });
+      return 0;
     }
   }
-
 
   @override
   Widget build(BuildContext context) {
@@ -679,7 +730,7 @@ class _PhoneState extends State<Phone> {
                       SizedBox(
                         width: 10,
                       ),
-                      Text('(+1)',
+                      Text('(+91)',
                         style: TextStyle(
                             fontWeight: FontWeight.bold
                         ),
@@ -818,7 +869,7 @@ class _PhoneState extends State<Phone> {
           ),
 
           SizedBox(
-            height: screenHeight * 0.17,
+            height: indicator ? screenHeight * 0.1 : screenHeight * 0.17,
           ),
 
           GestureDetector(
@@ -826,17 +877,24 @@ class _PhoneState extends State<Phone> {
               print('Create New Account Clicked');
               if(isChecked) {
                 if (_formKey.currentState!.validate()) {
-                  var userPhone = _phoneController.text;
-                  var agreePolicy = "1";
-                  var registrationType = 'phone';
-                  PhoneRegisterModel? create = await createUser(userPhone, agreePolicy, registrationType);
-                  print(create);
                   setState(() {
-                    if(create != null) {
-                      _phoneUser = create;
-                    }
-                    print(_phoneUser);
+                    indicator = true;
                   });
+                  var userPhone = _phoneController.text;
+                  userPhone = "+91"+userPhone;
+                  int create = await createUser(userPhone);
+                  print(create);
+                  if(create == 1) {
+                    _phoneUser = create;
+                    setState(() {
+                      indicator = false;
+                    });
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => LoginPage()));
+                  }
+                  print(_phoneUser);
+
                   /*Navigator.push(
                     context,
                     MaterialPageRoute(builder: (context) => CreateNewAccountPage())); */
@@ -856,6 +914,17 @@ class _PhoneState extends State<Phone> {
               ),
             ),
           ),
+
+          SizedBox(
+            height: screenHeight * 0.02,
+          ),
+
+          Visibility(
+            visible: indicator,
+            child: Center(
+              child: CircularProgressIndicator(),
+            ),
+          )
 
         ],
       ),

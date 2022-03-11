@@ -10,20 +10,16 @@ String phoneLoginModelToJson(PhoneLoginModel data) => json.encode(data.toJson())
 
 class PhoneLoginModel {
   PhoneLoginModel({
-    required this.authType,
-    required this.phone,
+    required this.token,
   });
 
-  String authType;
-  String phone;
+  String token;
 
   factory PhoneLoginModel.fromJson(Map<String, dynamic> json) => PhoneLoginModel(
-    authType: json["auth_type"],
-    phone: json["phone"],
+    token: json["token"],
   );
 
   Map<String, dynamic> toJson() => {
-    "auth_type": authType,
-    "phone": phone,
+    "token": token,
   };
 }
